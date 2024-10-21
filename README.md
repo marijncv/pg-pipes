@@ -1,10 +1,10 @@
 # pg-pipes
 
 An implementation of the [dagster-pipes](https://docs.dagster.io/concepts/dagster-pipes) protocol using [pgrx](https://github.com/pgcentralfoundation/pgrx) to report an asset materialization from a PostgreSQL user defined function. Inspired by:
-* https://github.com/pgcentralfoundation/pgrx/tree/develop/pgrx-examples/bad_ideas
-* https://github.com/dagster-io/dagster/tree/master/examples/experimental/external_assets/pipes/rust_check
+* PGRX [bad ideas](https://github.com/pgcentralfoundation/pgrx/tree/develop/pgrx-examples/bad_ideas)
+* Dagster Pipes [rust example](https://github.com/dagster-io/dagster/tree/master/examples/experimental/external_assets/pipes/rust_check)
 
-The `pg_pipes` extension exposes a `pipes_session` postgres UDF that takes a query, calls `EXPLAIN ANALYZE` on it, and reports an `AssetMaterialization` with the query the plan & execution details as metadata.
+The `pg_pipes` extension exposes a `pipes_session` postgres UDF that takes a query, calls `EXPLAIN ANALYZE` on it, and reports an `AssetMaterialization` with the query plan & execution details as metadata.
 
 ## Example
 
@@ -37,7 +37,6 @@ def pg_pipes_asset(
     ) as pipes_session:
         context_path = pipes_session.context_injector_params["path"]
         messages_path = pipes_session.message_reader_params["path"]
-        query = "SELECT * FROM pg_tables"
 
         conn = psycopg2.connect(
             database="pg_pipes", host=Path.home() / ".pgrx", port=28813
@@ -47,6 +46,8 @@ def pg_pipes_asset(
 
         # make sure the extension is enabled
         cursor.execute("drop extension if exists pg_pipes; create extension pg_pipes;")
+
+        query = "INSERT INTO example (value) VALUES (''1''), (''2''), (''3'')"
 
         # start the pipes_session in postgres
         cursor.execute(

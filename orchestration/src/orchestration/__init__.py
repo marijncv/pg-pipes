@@ -24,7 +24,6 @@ def pg_pipes_asset(
     ) as pipes_session:
         context_path = pipes_session.context_injector_params["path"]
         messages_path = pipes_session.message_reader_params["path"]
-        query = "SELECT * FROM pg_tables"
 
         conn = psycopg2.connect(
             database="pg_pipes", host=Path.home() / ".pgrx", port=28813
@@ -34,6 +33,8 @@ def pg_pipes_asset(
 
         # make sure the extension is enabled
         cursor.execute("drop extension if exists pg_pipes; create extension pg_pipes;")
+
+        query = "INSERT INTO example (value) VALUES (''1''), (''2''), (''3'')"
 
         # start the pipes_session in postgres
         cursor.execute(

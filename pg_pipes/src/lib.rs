@@ -5,6 +5,16 @@ mod pipes;
 
 use pipes::open_dagster_pipes;
 
+extension_sql!(
+    r#"
+CREATE TABLE example (
+    id serial8 not null primary key,
+    value text
+);
+"#,
+    name = "create_example_table",
+);
+
 #[pg_extern]
 fn pipes_session(context_path: &str, messages_path: &str, query: &str) -> Result<(), spi::Error> {
     let mut context = open_dagster_pipes(context_path, messages_path);
